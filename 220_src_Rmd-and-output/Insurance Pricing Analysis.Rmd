@@ -49,9 +49,14 @@ fn_format_tbl <- function(x){
 
 ### Objective
 
-The objective of the task is to analyse the pricing of car insurance premiums of Suncorp against its three competitors. The dataset consists of factors that affect the pricing of insurance premiums like vehicle details, owner / driver information, the details of other insurances on the vehicle, etc.
+The objective of the task is to analyse the pricing of car insurance premiums of Suncorp against its three competitors. The dataset consists of factors that affect the pricing of insurance premiums (e.g vehicle details, owner / driver information, the details of other insurances on the vehicle, etc.)
 
-We will do some basic cleaning of the data and then carry out exploratory data analysis. To explore the relationship between the Insurance prices and the feature set we will create a minimal Shiny App and host it [here](https://amitagni.shinyapps.io/Premium_Pricing_Factors/) . We will also build a simple pricing model and provide recommendations to SunCorp
+Process flow :
+
+* We will do some basic cleaning of the data and then carry out exploratory data analysis. 
+* We will create a minimal **[Shiny App](https://amitagni.shinyapps.io/Premium_Pricing_Factors/)** to explore the relationship between the Insurance prices and the feature set 
+* We will also build a simple pricing model
+* Provide recommendations to SunCorp
 
 ***
 
@@ -181,8 +186,8 @@ Now lets look at the individual feautures
 #### Numeric Features
 
 * The three numeric 'age' features have an almost normal distribution
-  + This is expected as majority of the people drive in their mid-ages. 
-  + The record count of vehicle age is nearly constant from 4 to 12 years, after which it starts dropping. This probably means that new cars are insured by a different providers or it could also mean that people have switched their insurance companies for their existing older cars. We would get a better idea if the volumes were provided.
+  + This is expected as majority of the driving population is in their mid-ages
+  + The record count of vehicle age is nearly constant from 4 to 12 years, after which it starts dropping. This probably means that new cars are insured by a different providers or it could also mean that people have switched their insurance companies for their existing older cars. This would have been more clear if the volumes were provided.
   + For modeling purposes, these columns could be converted to bins but for now we will leave them as is
   
 
@@ -195,10 +200,9 @@ plot_histogram(DT[,-..premium_cols])
 * The below charts gives the distrbution of the categorical features
   + Due to the rare-level merging that we did earlier the 'OTHERS' category in the MODEL feature now has high frequency of records
   + The LICCANCNT has a very low proportion (`r round(prop.table(table(DT$LICCANCNT))[2],4)`) of records and could ideally be ignored. But since it contains the conviction/suspension information we will retain it.
-  
 
 
-```{r fig.width=12,fig.height=16, fig.align='left'}
+```{r fig.width=12,fig.height=14, fig.align='left'}
 plot_bar(DT,maxcat = 100,nrow = 10,order_bar = T,ncol = 4)
 
 ```
@@ -225,7 +229,7 @@ ggcorrplot::ggcorrplot(correl, hc.order = FALSE, type = "lower",lab=TRUE,lab_siz
 
 ***
 
-### Insurance Premium columns 
+### Premium price analysis
 
 In this section, we will take a deeper look at how the four insurers are pricing their products?
 
@@ -242,7 +246,7 @@ summary(DT[,..premium_cols]) %>% fn_format_tbl()
     + Insurer 2 has a wider IQR, which is a good strategy as their prices would provide more/customised options to their customers. This could possibly result in higher revenue
     + Insurer 3 has the highest median price
   * Insurer 1 and 4 are similar in their pricing 
-    + They both have a lower median price of around 210-220, which is much lower than their competitors.
+    + They both have a median price of around 210-220, which is much lower than their competitors.
     + And they also have outliers
   
 ```{r fig.width=12}
@@ -266,7 +270,7 @@ plot_histogram(DT[,..premium_cols])
 #### Feature Importance
 
 * Now, we will look at the factors that each INSURER uses to arrive at their premium pricing
-  + We could have possibly used tree algorithms like RandomForest or Xgboost as they have give feature importance
+  + We could have used tree algorithms like RandomForest or Xgboost as they have give feature importance
   + But we will use the entropy and information gain algorithm from the FSelectorRcpp package to determine the feature importance. 
 [Source](http://mi2-warsaw.github.io/FSelectorRcpp/articles/get_started.html)
 
@@ -348,22 +352,24 @@ We will build a very basic pricing model for Insurer 1 using XGBoost algorithm
 #### Process
   + We will use the prices of Insurer1's competitors as Target variable
   + The model learns from the pricing strategies applied by the competitors and comes out with the prices that can be used by Insurer1
-  + Insurer1 could potentially use the predicted prices to conduct an A/B testing and measure the impact on its sales and revenue
+  + Insurer1 could use the predicted prices to conduct an A/B testing and measure the impact on its sales and revenue
 
 
 #### Model Evaluation
-* If we look at the below boxplots, we can see that the model predicts a median price which is higher than its existing price and lower than Insurer 2 and 3
+* If we look at the below boxplots, we can see that the model (INSURER1_NEW plot) predicts a median price which is higher than its existing price and lower than Insurer 2 and 3
 * The distribution of the prices is approximately normal as seen in the histogram
 
 
 #### Limitations
 
-* Prior Sales and the Market Demand are the key factors used in the pricing of any products. The pricing models for vehicle insurance products also heavily rely on past accidents and claims, none of which were available for modeling
+* Prior Sales and Market Demand are the key factors for product pricing. Vehicle insurance pricing also relies heavily on factors like past accidents and claims, none of which were available for modeling
 * Key model improvement strategies like feature engineering, resampling, hyperparameter tuning, model ensembling, etc were not utilised
-* **The pricing structure predicted by the model is better than the one currently used by Insurer1, but the model itself is nothing better than an average model and only included here as a POC (Proof of Concept)**
+* **The pricing structure predicted by the model is better than the one currently used by Insurer1, but the model itself is nothing better than an average model and only included here as a POC**
 
 
 ```{r eval = F}
+
+#### The below model was run and the predictions were saved in 110_data_intermediate folder #####
 
 #Melt premiums of all the competitors 
 DT_train <- DT %>% melt(measure.vars = premium_cols)
@@ -464,9 +470,10 @@ plot_histogram(DT[,c('INSURER1_PREMIUM','INSURER1_PREMIUM_NEW')])
 
 ### Summary
 
-* Insurer1 is currently having a pricing strategy in which their pricing is done by slabs. This means the customers will have less buying options to choose from. If they adopt a dynamic pricing (with a smoother pricing curve), it could help in generating incremental revenue
-* The pricing of Insurer1 is majorly based on the Age columns, they could consider other available factors 
-* The insurer can probably conduct A/B testing using the prices predicted by basic model presented above and measure its impact on sales and revenue.
+* Insurer1 is currently having a pricing strategy in which the products are priced by slabs. This means the customers will have less buying options to choose from. 
+* If they adopt a dynamic pricing (with a smoother pricing curve), it would help in generating incremental revenue
+* The premium prices are majorly set based on the age columns, they could consider giving more weightage to the other available factors 
+* Also, they could use the prices predicted by the basic model and conduct market testing to measure its impact on sales and revenue.
 
 
 ***
