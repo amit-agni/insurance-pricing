@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1572253631294.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "536119835",
+    "id" : "19134940",
+    "lastKnownWriteTime" : 1572253646,
+    "last_content_update" : 1572253646046,
+    "path" : "/Mac Backup/OneDrive/R/Insurance Premium Pricing/220_src_Rmd-and-output/Insurance Pricing Analysis.Rmd",
+    "project_path" : "220_src_Rmd-and-output/Insurance Pricing Analysis.Rmd",
+    "properties" : {
+        "cursorPosition" : "445,45",
+        "scrollLine" : "405"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
